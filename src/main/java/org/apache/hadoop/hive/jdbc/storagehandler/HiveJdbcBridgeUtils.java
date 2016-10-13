@@ -33,6 +33,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.WritableVoidObjectInspector;
 
 public class HiveJdbcBridgeUtils {
 
@@ -122,6 +123,12 @@ public class HiveJdbcBridgeUtils {
 		switch (fieldOI.getCategory()) {
 		case PRIMITIVE: {
 			PrimitiveObjectInspector oi = (PrimitiveObjectInspector) fieldOI;
+
+			// nullable value control
+			if (oi instanceof WritableVoidObjectInspector) {
+				return ((WritableVoidObjectInspector) oi).getWritableConstantValue();
+			}
+
 			return oi.getPrimitiveJavaObject(field);
 		}
 		case LIST: {
